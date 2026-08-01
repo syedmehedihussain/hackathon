@@ -1,0 +1,15 @@
+Contract ID: C-004
+Title: EventPro Partnership Agreement
+Parties: Northstar Solutions Ltd. and EventPro Bangladesh Ltd.
+
+3.2 Payment
+Undisputed invoices are payable within 30 calendar days after receipt and acceptance of the related service.
+
+7.1 Termination
+Either party may terminate this Agreement for convenience by giving 30 days written notice.
+
+9.1 Confidentiality
+Both parties must protect the other party's confidential information and use it only for this Agreement. This duty continues for three years after the Agreement ends. Public, previously known, and independently developed information is excluded.
+
+Dataset Note:
+This agreement has no automatic renewal clause.

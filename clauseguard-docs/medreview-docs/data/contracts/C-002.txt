@@ -1,0 +1,18 @@
+Contract ID: C-002
+Title: NovaStaff Professional Services Agreement
+Parties: Northstar Solutions Ltd. and NovaStaff Services Ltd.
+
+3.1 Payment
+The Customer must pay 100% of the project fee before NovaStaff begins any work.
+
+6.1 Termination
+NovaStaff may terminate the Agreement for any reason by giving 7 days notice. The Customer may terminate only for a material breach that remains unfixed for 30 days.
+
+8.1 Confidentiality
+The Customer must protect all confidential information received from NovaStaff. NovaStaff has no confidentiality duty for information received from the Customer.
+
+10.1 Intellectual Property
+NovaStaff owns all reports, software, designs, and other work created under this Agreement. The Customer receives a non-transferable licence to use the work for six months.
+
+Dataset Note:
+This excerpt does not include an automatic renewal clause.

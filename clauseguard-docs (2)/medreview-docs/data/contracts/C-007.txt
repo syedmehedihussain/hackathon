@@ -1,0 +1,18 @@
+Contract ID: C-007
+Title: Freelance Development Agreement
+Parties: Northstar Solutions Ltd. and an Independent Developer
+
+2.1 Payment
+The Customer will pay 50% of the total fee before work begins and 50% after final acceptance.
+
+5.1 Confidentiality
+Both parties must protect confidential information for one year after the Agreement ends.
+
+7.1 Intellectual Property
+After full payment, the Customer owns all custom deliverables. The Developer keeps ownership of tools created before this Agreement and gives the Customer a permanent licence to use those tools within the deliverables.
+
+9.1 Limitation of Liability
+The Developer's total liability is limited to the fees paid during the previous 12 months.
+
+Dataset Note:
+This excerpt does not include a termination clause.

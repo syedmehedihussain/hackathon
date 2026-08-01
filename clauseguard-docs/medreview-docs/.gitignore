@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# next
+.next/
+out/
+
+# env & secrets — NEVER commit
+.env
+.env*.local
+
+# puku editor config (learned this the hard way — keys leaked via .puku last time)
+.puku/
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+*.log

@@ -1,0 +1,21 @@
+Contract ID: C-005
+Title: MarketLoop Marketing Services Agreement
+Parties: Northstar Solutions Ltd. and MarketLoop Agency Ltd.
+
+2.1 Payment
+All invoices must be paid within 7 calendar days and before the related campaign begins.
+
+4.3 Automatic Renewal
+After the first month, the Agreement renews one month at a time. Either party may stop the next renewal by giving 7 days written notice.
+
+6.2 Termination
+Either party may terminate the Agreement for convenience by giving 14 days written notice.
+
+8.1 Intellectual Property
+MarketLoop owns all campaign designs, reports, and custom materials. The Customer may use them only while this Agreement remains active.
+
+10.1 Liability
+The Customer has unlimited liability. MarketLoop's total liability is limited to one month of fees.
+
+Dataset Note:
+The agreement contains several clauses that differ from the company standards.

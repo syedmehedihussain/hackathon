@@ -1,0 +1,62 @@
+[
+  {
+    "id": "PQ-01",
+    "contract_id": "C-001",
+    "question": "Review the automatic renewal clause. What is the risk level and why?"
+  },
+  {
+    "id": "PQ-02",
+    "contract_id": "C-001",
+    "question": "Review the payment clause against the company standard."
+  },
+  {
+    "id": "PQ-03",
+    "contract_id": "C-002",
+    "question": "Who owns the custom work, and does this match the company standard?"
+  },
+  {
+    "id": "PQ-04",
+    "contract_id": "C-003",
+    "question": "Review the data breach notification time."
+  },
+  {
+    "id": "PQ-05",
+    "contract_id": "C-003",
+    "question": "Does the security clause require encryption of stored data?"
+  },
+  {
+    "id": "PQ-06",
+    "contract_id": "C-004",
+    "question": "Review the termination clause."
+  },
+  {
+    "id": "PQ-07",
+    "contract_id": "C-004",
+    "question": "Will this contract renew automatically?"
+  },
+  {
+    "id": "PQ-08",
+    "contract_id": "C-005",
+    "question": "Review the ownership of campaign materials."
+  },
+  {
+    "id": "PQ-09",
+    "contract_id": "C-006",
+    "question": "Review the limitation of liability clause."
+  },
+  {
+    "id": "PQ-10",
+    "contract_id": "C-006",
+    "question": "Does the termination-for-breach clause provide time to fix a normal breach?"
+  },
+  {
+    "id": "PQ-11",
+    "contract_id": "C-007",
+    "question": "Review the confidentiality period."
+  },
+  {
+    "id": "PQ-12",
+    "contract_id": "C-008",
+    "question": "Review the automatic renewal clause."
+  }
+]
