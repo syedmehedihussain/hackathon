@@ -59,6 +59,20 @@ export async function POST(req: NextRequest) {
   if (!contractId || !question) {
     return NextResponse.json({ error: "contract_id and question are required" }, { status: 400 });
   }
+  // Cheap input guardrails (defense in depth — the semantic gate in
+  // detectAndRetrieve is what actually decides relevance/abstention).
+  if (question.length < 5) {
+    return NextResponse.json(
+      { error: "Please enter a fuller question (at least 5 characters)." },
+      { status: 400 },
+    );
+  }
+  if (question.length > 500) {
+    return NextResponse.json(
+      { error: "Question is too long (max 500 characters)." },
+      { status: 400 },
+    );
+  }
 
   // 1. cache
   const cacheKey = hashQuery(contractId, question);
@@ -77,10 +91,10 @@ export async function POST(req: NextRequest) {
         contractId,
         r.clauseType,
         r.reason === "low_type_confidence"
-          ? "Could not determine which clause type the question is about with enough confidence."
+          ? `This question doesn't appear to relate to any clause in ${contractId}. Try asking about payment, termination, data protection, confidentiality, automatic renewal, intellectual property, or limitation of liability.`
           : r.reason === "no_candidates"
             ? `No ${r.clauseType} clause found in ${contractId}.`
-            : `Top ${r.clauseType} clause similarity was below the confidence threshold.`,
+            : `The closest ${r.clauseType} clause in ${contractId} wasn't a strong enough match to assess confidently.`,
         { source: `${contractId} (no clause of type ${r.clauseType})` },
       );
       await Promise.all([

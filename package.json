@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx scripts/seed.ts",
+    "embed:types": "tsx scripts/embed-types.ts",
     "test": "tsx scripts/test-gate.ts"
   },
   "dependencies": {

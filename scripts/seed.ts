@@ -17,6 +17,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { embed } from "../lib/gemini";
+import { CLAUSE_TYPES, CLAUSE_TYPE_DESCRIPTIONS } from "../lib/retrieval";
 
 type RawContract = {
   id: string;
@@ -140,6 +141,7 @@ async function main() {
     ["clauses", "id"],
     ["standards", "id"],
     ["contracts", "id"],
+    ["clause_type_embeddings", "clause_type"],
   ];
   for (const [tbl, pk] of wipeTargets) {
     const { error } = await sb.from(tbl).delete().not(pk, "is", null);
@@ -193,6 +195,19 @@ async function main() {
   // pgvector accepts number[] for the embedding column
   const { error: clErr } = await sb.from("clauses").insert(clauseRows);
   if (clErr) throw new Error(`clauses insert: ${clErr.message}`);
+
+  // 6b. clause-type embeddings (precomputed so runtime never embeds them)
+  console.log("Embedding clause-type descriptions…");
+  const typeRows: any[] = [];
+  for (const t of CLAUSE_TYPES) {
+    const v = await embed(CLAUSE_TYPE_DESCRIPTIONS[t]);
+    if (!v) throw new Error(`Failed to embed clause-type description ${t}`);
+    typeRows.push({ clause_type: t, embedding: v });
+    process.stdout.write(".");
+  }
+  process.stdout.write("\n");
+  const { error: teErr } = await sb.from("clause_type_embeddings").insert(typeRows);
+  if (teErr) throw new Error(`clause_type_embeddings insert: ${teErr.message}`);
 
   // 7. summary
   const [{ count: cCount }, { count: clCount }, { count: sCount }] = await Promise.all([

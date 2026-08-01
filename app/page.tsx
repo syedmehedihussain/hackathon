@@ -208,17 +208,21 @@ export default function Page() {
           <textarea
             id="q"
             rows={2}
+            maxLength={500}
             className="rounded-md border border-rule px-3 py-2 text-sm"
             placeholder="e.g. What notice is required to stop automatic renewal?"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
+          {question.trim().length > 0 && question.trim().length < 5 && (
+            <span className="text-xs text-muted">Enter a fuller question (at least 5 characters).</span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={busy || !contractId || !question.trim()}
+            disabled={busy || !contractId || question.trim().length < 5}
             className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-40"
           >
             {busy ? "Reviewing…" : "Run review"}

@@ -43,8 +43,13 @@ export const CLAUSE_TYPE_DESCRIPTIONS: Record<ClauseType, string> = {
     "Caps on liability, what the cap does or does not cover, exclusions.",
 };
 
-// Similarity floor for both type detection AND the abstention gate.
-const THRESHOLD = 0.45; // tuned down a bit — many public questions are paraphrased.
+// Similarity floors for the abstention gate, calibrated for gemini-embedding-001
+// (768-dim). Measured cosine bands: on-topic questions score det 0.60-0.87 /
+// clause 0.65-0.79; off-topic ("who is joy", "hello", ...) score det/clause
+// <= ~0.51. These thresholds sit in the gap so off-topic queries abstain while
+// every public question still passes. Retune if the embedding model changes.
+const TYPE_THRESHOLD = 0.55; // Step A: is the question clearly about some clause type?
+const CLAUSE_THRESHOLD = 0.58; // Step C: does the best matching clause actually fit?
 
 // --- vector math -----------------------------------------------------------
 
@@ -63,9 +68,39 @@ function cosine(a: number[], b: number[]): number {
 
 let _typeEmbeddingCache: { type: ClauseType; vec: number[] }[] | null = null;
 
-/** Embed all 7 type descriptions and cache. Returns null on total Gemini failure. */
+/**
+ * Get the 7 clause-type embeddings, cached in-module. Reads them from the
+ * precomputed `clause_type_embeddings` table first (one query, zero Gemini
+ * calls) so cold starts don't pay 7 sequential embed calls. Falls back to
+ * embedding the descriptions live if the table is missing/empty (resilience).
+ * Returns null only on total Gemini failure of the fallback path.
+ */
 export async function getTypeEmbeddings(): Promise<{ type: ClauseType; vec: number[] }[] | null> {
   if (_typeEmbeddingCache) return _typeEmbeddingCache;
+
+  // Fast path: precomputed embeddings from the DB (populated at seed time).
+  try {
+    const sb = getSupabaseAdmin();
+    const { data, error } = await sb
+      .from("clause_type_embeddings")
+      .select("clause_type, embedding");
+    if (!error && data && data.length >= CLAUSE_TYPES.length) {
+      const byType = new Map<string, number[]>();
+      for (const row of data as { clause_type: string; embedding: number[] | string }[]) {
+        const vec = typeof row.embedding === "string" ? JSON.parse(row.embedding) : row.embedding;
+        if (Array.isArray(vec)) byType.set(row.clause_type, vec as number[]);
+      }
+      if (CLAUSE_TYPES.every((t) => byType.has(t))) {
+        const out = CLAUSE_TYPES.map((t) => ({ type: t, vec: byType.get(t)! }));
+        _typeEmbeddingCache = out;
+        return out;
+      }
+    }
+  } catch (e) {
+    console.warn("[retrieval] type-embedding table read failed, embedding live:", (e as Error).message);
+  }
+
+  // Fallback: embed the 7 descriptions live (original behavior).
   const out: { type: ClauseType; vec: number[] }[] = [];
   for (const t of CLAUSE_TYPES) {
     const v = await embed(CLAUSE_TYPE_DESCRIPTIONS[t]);
@@ -90,7 +125,7 @@ export function detectClauseType(
   let best: TypeDetection = { type: "Payment", similarity: -1, confidence: "low" };
   for (const { type, vec } of typeVecs) {
     const s = cosine(questionVec, vec);
-    if (s > best.similarity) best = { type, similarity: s, confidence: s >= THRESHOLD ? "ok" : "low" };
+    if (s > best.similarity) best = { type, similarity: s, confidence: s >= TYPE_THRESHOLD ? "ok" : "low" };
   }
   return best;
 }
@@ -136,7 +171,7 @@ export async function retrieveClause(
     if (!best || s > best.similarity) best = { clause: r, similarity: s };
   }
   if (!best) return { ok: false, reason: "no_candidates", clauseType };
-  if (best.similarity < THRESHOLD) {
+  if (best.similarity < CLAUSE_THRESHOLD) {
     return { ok: false, reason: "below_threshold", clauseType };
   }
   return { ok: true, hit: best };

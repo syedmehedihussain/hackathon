@@ -34,6 +34,13 @@ create table if not exists standards (
   embedding     vector(768)
 );
 
+-- clause-type embeddings (precomputed once at seed time so runtime never has to
+-- embed the 7 type descriptions on a cold start — see lib/retrieval.ts)
+create table if not exists clause_type_embeddings (
+  clause_type text primary key,
+  embedding   vector(768)
+);
+
 -- reviews (audit trail + human-in-the-loop)
 create table if not exists reviews (
   id                uuid primary key default gen_random_uuid(),
