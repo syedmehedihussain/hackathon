@@ -2,7 +2,17 @@
 // Loads /data into Supabase, computes embeddings once, inserts everything.
 // Run with: npm run seed (requires .env.local with Supabase + Gemini keys).
 
-import "dotenv/config";
+import dotenv from "dotenv";
+// Next.js loads .env.local automatically for the app, but standalone tsx
+// scripts do not — load .env.local first, then .env as a fallback.
+dotenv.config({ path: ".env.local" });
+dotenv.config();
+// Node < 22 has no global WebSocket; supabase-js builds a realtime client
+// eagerly in its constructor and throws without one. Polyfill for scripts.
+import WebSocket from "ws";
+if (typeof (globalThis as any).WebSocket === "undefined") {
+  (globalThis as any).WebSocket = WebSocket;
+}
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
@@ -123,8 +133,16 @@ async function main() {
 
   // 3. wipe (idempotent re-seed)
   console.log("Wiping existing rows…");
-  for (const tbl of ["query_cache", "reviews", "clauses", "standards", "contracts"]) {
-    const { error } = await sb.from(tbl).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  // Each table's primary key column — query_cache keys on query_hash, not id.
+  const wipeTargets: [string, string][] = [
+    ["query_cache", "query_hash"],
+    ["reviews", "id"],
+    ["clauses", "id"],
+    ["standards", "id"],
+    ["contracts", "id"],
+  ];
+  for (const [tbl, pk] of wipeTargets) {
+    const { error } = await sb.from(tbl).delete().not(pk, "is", null);
     if (error && !error.message.includes("0 rows")) console.warn(`wipe ${tbl}: ${error.message}`);
   }
 

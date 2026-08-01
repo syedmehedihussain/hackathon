@@ -5,7 +5,8 @@
 // All calls are wrapped in try/catch; callers decide the fallback. The system
 // MUST NOT crash on a Gemini failure — see ARCHITECTURE.md failure modes.
 
-const EMBED_MODEL = "text-embedding-004";
+const EMBED_MODEL = "gemini-embedding-001";
+const EMBED_DIMS = 768; // must match vector(768) in docs/schema.sql
 const GEN_MODEL = "gemini-flash-latest";
 
 function apiKey(): string {
@@ -33,13 +34,14 @@ async function postJSON(url: string, body: unknown): Promise<any> {
 /** Embed a single string → 768-dim number[]. Returns null on failure (caller falls back). */
 export async function embed(text: string): Promise<number[] | null> {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:embedContent?key=${encodeURIComponent(apiKey())}`;
     const body = {
       model: `models/${EMBED_MODEL}`,
       content: { parts: [{ text }] },
+      // gemini-embedding-001 defaults to 3072 dims; pin to 768 to match schema.
+      outputDimensionality: EMBED_DIMS,
     };
-    const direct = `https://generativelanguage.googleapis.com/v1beta/${EMBED_MODEL}:embedContent`;
-    const r = await fetch(direct, {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:embedContent`;
+    const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey() },
       body: JSON.stringify(body),
