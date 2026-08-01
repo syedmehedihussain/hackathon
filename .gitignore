@@ -9,8 +9,16 @@ out/
 .env
 .env*.local
 
-# puku editor config (learned this the hard way — keys leaked via .puku last time)
+# puku editor config — NEVER commit (can carry API keys in plan/state)
 .puku/
+.puku-cli/
+*.puku-cli
+*.puku-cli.json
+.puku-cli/settings.json
+.puku-cli/plan.md
+.puku-cli/.state/
+puku/
+puku-cli/
 
 # vercel
 .vercel
