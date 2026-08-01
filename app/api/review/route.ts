@@ -35,6 +35,7 @@ function abstain(
     clause_type: clauseType,
     risk_level: "Not Enough Information" as const,
     reason: "Not enough information to make a reliable assessment.",
+    suggested_action: "No action needed.",
     note: reason,
     evidence: {
       contract_clause: null,
@@ -105,6 +106,7 @@ export async function POST(req: NextRequest) {
           clause_type: r.clauseType,
           risk_level: result.risk_level,
           reason: result.reason,
+          suggested_action: result.suggested_action,
           evidence_clause_id: null,
           standard_id: null,
         }),
@@ -130,6 +132,7 @@ export async function POST(req: NextRequest) {
           clause_type: r.clauseType,
           risk_level: result.risk_level,
           reason: result.reason,
+          suggested_action: result.suggested_action,
           evidence_clause_id: r.hit.clause.id,
           standard_id: null,
         }),
@@ -154,6 +157,7 @@ export async function POST(req: NextRequest) {
       clause_type: r.clauseType,
       risk_level: verdict.risk_level,
       reason: verdict.reason,
+      suggested_action: verdict.suggested_action,
       detection_similarity: Number(r.detection.similarity.toFixed(3)),
       clause_similarity: Number(r.hit.similarity.toFixed(3)),
       evidence: {
@@ -179,6 +183,7 @@ export async function POST(req: NextRequest) {
         clause_type: r.clauseType,
         risk_level: result.risk_level,
         reason: result.reason,
+        suggested_action: result.suggested_action,
         evidence_clause_id: r.hit.clause.id,
         standard_id: standard.id,
       }),
@@ -210,6 +215,7 @@ async function insertReviewRow(row: {
   clause_type: string;
   risk_level: string;
   reason: string;
+  suggested_action: string;
   evidence_clause_id: string | null;
   standard_id: string | null;
 }) {

@@ -15,6 +15,7 @@ type ReviewResult = {
   clause_type: string;
   risk_level: RiskLabel;
   reason: string;
+  suggested_action?: string;
   detection_similarity?: number;
   clause_similarity?: number;
   note?: string;
@@ -286,6 +287,16 @@ function ResultCard({
           <p className="mt-2 text-xs text-muted">{result.note}</p>
         )}
       </div>
+
+      {result.suggested_action && result.suggested_action !== "No action needed." && (
+        <div className="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
+          <h3 className="text-xs font-semibold uppercase tracking-wide">Suggested next step</h3>
+          <p className="mt-1 leading-relaxed">{result.suggested_action}</p>
+          <p className="mt-1 text-xs text-sky-800/80">
+            A suggestion for the human reviewer to consider — not legal advice.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-md border border-rule p-4">

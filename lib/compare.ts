@@ -62,8 +62,10 @@ Decide a risk level from exactly these four values:
 
 Give a short, plain-language reason (1–2 sentences) that a non-lawyer can understand, referring to the concrete difference (e.g. notice periods, timeframes, ownership).
 
+Also give a short, plain-language "suggested_action" describing one concrete next step a human reviewer can take to address the issue — for example: "Ask the counterparty to add a 30-day notice clause", "Request a 12-month liability cap with carve-outs for data breach and IP infringement", "Negotiate the late-fee cap down to 1% per month or less". This is a suggestion for the human reviewer to consider, not legal advice. If risk_level is "Low Risk" or "Not Enough Information", suggest "No action needed." — do not invent action items for clauses that are safe or missing.
+
 Respond with ONLY this JSON, no markdown, no backticks:
-{"risk_level": "<one of the four>", "reason": "<short reason>"}`;
+{"risk_level": "<one of the four>", "reason": "<short reason>", "suggested_action": "<short concrete next step>"}`;
 
 function buildUserMessage(args: {
   contractId: string;
@@ -84,7 +86,10 @@ COMPANY STANDARD (${args.standardId}, category ${args.category}):
 export type CompareOutcome = {
   risk_level: RiskLabel;
   reason: string;
+  suggested_action: string;
 };
+
+const NO_ACTION = "No action needed.";
 
 /**
  * Compare one clause against one standard with Gemini Flash. Returns strict-JSON
@@ -105,15 +110,27 @@ export async function compareClauseToStandard(args: {
     return {
       risk_level: "Not Enough Information",
       reason: "Not enough information to make a reliable assessment.",
+      suggested_action: NO_ACTION,
     };
   }
   const rl = (parsed as any).risk_level;
   const reason = (parsed as any).reason;
+  const action = (parsed as any).suggested_action;
   if (!isRisk(rl) || typeof reason !== "string") {
     return {
       risk_level: "Not Enough Information",
       reason: "Not enough information to make a reliable assessment.",
+      suggested_action: NO_ACTION,
     };
   }
-  return { risk_level: rl, reason: reason.slice(0, 400) };
+  // Validate suggested_action shape. If missing/bad, pick a safe default by risk.
+  let safeAction = NO_ACTION;
+  if (typeof action === "string") {
+    const trimmed = action.trim();
+    if (trimmed.length > 0 && trimmed.length <= 400) safeAction = trimmed;
+    else if (trimmed.length > 400) safeAction = trimmed.slice(0, 400);
+  } else if (rl === "Medium Risk" || rl === "High Risk") {
+    safeAction = "Review this clause with the human reviewer and consider negotiating the differing terms.";
+  }
+  return { risk_level: rl, reason: reason.slice(0, 400), suggested_action: safeAction };
 }
